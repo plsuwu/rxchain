@@ -1,3 +1,6 @@
+# nix-direnv cache
+.direnv/
+
 # Compiler files
 cache/
 out/
@@ -19,5 +22,5 @@ docs/
 .env.*
 !.env.example
 
-# nix-direnv cache
-.direnv/
+# Soldeer
+/dependencies
