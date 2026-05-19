@@ -41,7 +41,9 @@ contract PrescriptionDispense is PrescriptionControl {
         }
 
         if (rx.repeatsRemaining > 0) {
-            unchecked { rx.repeatsRemaining -= 1; }
+            unchecked {
+                rx.repeatsRemaining -= 1;
+            }
         }
 
         if (rx.repeatsRemaining == 0) {

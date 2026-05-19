@@ -3,7 +3,6 @@ pragma solidity ^0.8.13;
 
 import {PrescriptionMint} from "./PrescriptionMint.sol";
 
-
 /// @dev Note on control flow: the prescriber can mint to a patient (i.e., any address), and
 ///      the patient can then only forward it on to whichever pharmacy they need to.
 abstract contract PrescriptionControl is PrescriptionMint {
@@ -15,7 +14,7 @@ abstract contract PrescriptionControl is PrescriptionMint {
 
     function _update(address to, uint256 tokenId, address auth) internal virtual override returns (address from) {
         from = _ownerOf(tokenId);
-        
+
         // constrain to genuine transfers - mints and burns are allowed through
         if (from != address(0) && to != address(0)) {
             PrescriptionData storage rx = _prescriptions[tokenId];
