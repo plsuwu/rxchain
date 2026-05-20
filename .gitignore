@@ -32,3 +32,6 @@ node_modules/
 
 # Cargo
 target/
+
+networkFiles/
+qbftConfigFile.json

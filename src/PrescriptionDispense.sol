@@ -33,10 +33,6 @@ contract PrescriptionDispense is PrescriptionControl {
         }
 
         if (rx.expiry <= block.timestamp) {
-            if (rx.locked == false) {
-                rx.locked = true;
-            }
-
             revert ExpiredOnDispense();
         }
 
@@ -50,5 +46,7 @@ contract PrescriptionDispense is PrescriptionControl {
             rx.locked = true;
             emit PrescriptionPermanentlyLocked(tokenId);
         }
+
+        emit Dispensed(tokenId, msg.sender, rx.repeatsRemaining);
     }
 }

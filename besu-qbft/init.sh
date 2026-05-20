@@ -1,14 +1,5 @@
-# RxChain
+#!/usr/bin/env bash
 
-IFB452 Blockchain project
-
-## Besu Setup
-
-The commands below should already have been run with the output committed, so starting the network/chain/whatever
-is just a matter of running `docker compose up -d` in the `besu-qbft` directory. Additionally, the below is also
-the content of the `init.sh` script in `besu-qbft`. For the sake of documentation, however:
-
-```bash
 # create the qbft config base
 cat > qbftConfigFile.json <<'EOF'
 {
@@ -45,11 +36,4 @@ docker run --rm -v "$PWD":/data hyperledger/besu:latest \
 cp networkFiles/genesis.json .   
 mkdir -p node                
 cp networkFiles/keys/0x*/key node/key
-```
-
-Then run the `docker-compose.yml` to start the Hyperledger Besu chain: `docker compose up -d` 
-
-### Foundry Documentation
-
-https://book.getfoundry.sh/
 
