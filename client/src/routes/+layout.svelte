@@ -1,9 +1,13 @@
 <script lang="ts">
-	import './layout.css';
-	import favicon from '$lib/assets/favicon.svg';
+	import "./layout.css";
+	import Navigation from "$lib/components/navigation/Navigation.svelte";
+	import { ModeWatcher } from "mode-watcher";
 
 	let { children } = $props();
 </script>
 
-<svelte:head><link rel="icon" href={favicon} /></svelte:head>
+<ModeWatcher disableTransitions={false} />
+
+<Navigation />
+<div class="my-12"></div>
 {@render children()}
