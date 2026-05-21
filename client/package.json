@@ -50,6 +50,8 @@
 	},
 	"dependencies": {
 		"@lucide/svelte": "^1.16.0",
+		"@oslojs/crypto": "^1.0.1",
+		"@oslojs/encoding": "^1.1.0",
 		"@wagmi/core": "^3.4.12",
 		"abitype": "^1.2.4",
 		"better-sqlite3": "^12.8.0",

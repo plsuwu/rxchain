@@ -36,7 +36,7 @@ echo ""
 # the admin wallet to hopefull sidestep any of these potential issues
 for A in $PRESCRIBER $PATIENT $PHARMACY; do
     echo "creating $A:"
-    cast send --rpc-url $RPC --private-key $ADMIN_PK --value 1ether $A
+    cast send --rpc-url $RPC --private-key $ADMIN_PK --value 1ether $A >/dev/null
     echo ""
 done
 
@@ -55,129 +55,129 @@ echo "Registry:     $REGISTRY"
 echo "RX:           $RX"
 echo "-----------------------------------------------------------"
 
-echo ""
-echo "==========================================================================="
-echo "1. credential provision"
-echo "==========================================================================="
-echo ""
-
-# 1. give credentials to prescriber and pharmacy
-LICENSE=$(cast format-bytes32-string "MED0001234567")
-
-echo "  - provision Prescriber role:"
-cast send $REGISTRY "addPrescriber(address,bytes32)" $PRESCRIBER $LICENSE \
-  --rpc-url $RPC --private-key $ADMIN_PK
-
-echo "---"
-echo ""
-
-echo "  - provision Pharmacy role:"
-cast send $REGISTRY "addPharmacy(address)" $PHARMACY \
-  --rpc-url $RPC --private-key $ADMIN_PK
-
-echo "---"
-echo ""
-
-# confirm
-echo "checking 'isPrescriber' for prescriber role:"
-cast call $REGISTRY "isPrescriber(address)(bool)" $PRESCRIBER --rpc-url $RPC    # == true 
-echo ""
-
-echo "checking 'isPharmacy' for pharmacy role:"
-cast call $REGISTRY "isPharmacy(address)(bool)" $PHARMACY --rpc-url $RPC        # == true
-echo ""
-
-echo ""
-echo "==========================================================================="
-echo "2. minting (or prescribing or whatever)"
-echo "==========================================================================="
-echo ""
-
-# 2. prescribe (i.e. mint)
-#       a. build encoded fields:
-echo "encoding patient hash, medication, expiration..."
-PATIENT_HASH=$(cast keccak "ihi-8003608166690503:per-patient-salt")
-MED=$(cast format-bytes32-string "PBS0001DK")
-EXPIRY=$(( $(date +%s) + 2592000 )) # current unix timestamp + 30 days in seconds 
-echo "ok."
-echo ""
-
-#       b. call `mint()`
+# echo ""
+# echo "==========================================================================="
+# echo "1. credential provision"
+# echo "==========================================================================="
+# echo ""
 #
-# noting that while `mint()` returns the tokenId, `cast send` provides us with a receipt
-# and NOT the return value. 
-# we can pull from the `Transfer` event, with the tokenId as the fourth indexed topic
-
-echo "calling 'mint()'..."
-# function mint(address to, bytes32 patientId, bytes32 medicationCode, uint32 dosage, uint8 repeats, uint64 expiry)
-TX=$(cast send $RX "mint(address,bytes32,bytes32,uint32,uint8,uint64)" \
-    $PATIENT $PATIENT_HASH $MED 500 1 $EXPIRY \
-    --rpc-url $RPC --private-key $PRESCRIBER_PK \
-    --json | jq -r .transactionHash)
-
-echo "retrieving tokenId..."
-TOKEN_ID=$(cast receipt $TX --rpc-url $RPC --json \
-    | jq -r '.logs[] | select(.topics[0]="0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef") | .topics[3]' \
-    | cast to-dec)
-
-echo "minted tokenId=$TOKEN_ID"
-
-# + read the stored prescription back
+# # 1. give credentials to prescriber and pharmacy
+# LICENSE=$(cast format-bytes32-string "MED0001234567")
 #
-echo "stored prescription:"
-cast call $RX \
-  "getPrescription(uint256)((bytes32,bytes32,address,bytes32,uint32,uint8,uint8,uint64,bool))" \
-  1 --rpc-url $RPC
-
-echo ""
-echo "==========================================================================="
-echo "3. transferring"
-echo "==========================================================================="
-echo ""
-
-# 3. transfer
-# contract checks:
-#   - recipient is a valid pharmacy
-#   - token is not locked or expired
-cast send $RX "transferFrom(address,address,uint256)" $PATIENT $PHARMACY 1 \
-    --rpc-url $RPC --private-key $PATIENT_PK
-
-echo ""
-
-cast call $RX "ownerOf(uint256)(address)" 1 --rpc-url $RPC      # == $PHARMACY
-
-
-
-# b. double-check guarding by attempting to send somewhere illegal
-#       - SHOULD revert with `RecipientNotPharmacy`
-echo ""
-echo "attempt to send to non-pharmacy should revert:"
-cast send $RX "transferFrom(address,address,uint256)" $PATIENT $ADMIN 1\
-    --rpc-url $RPC --private-key $PATIENT_PK
-
-echo ""
-echo "==========================================================================="
-echo "4. dispensing"
-echo "==========================================================================="
-echo ""
-
-# 4. dispense
-echo "dispensing:"
-cast send $RX "dispense(uint256)" 1 --rpc-url $RPC --private-key $PHARMACY_PK
-
-# `repeatsRemaining` and `locked` are the 6th and 9th tuple fields:
-echo "retrieving prescription details:"
-cast call $RX \
-  "getPrescription(uint256)((bytes32,bytes32,address,bytes32,uint32,uint8,uint8,uint64,bool))" \
-  1 --rpc-url $RPC
-
-
-echo ""
-echo "check locking mechanism - should revert:"
-echo "      1. dispense should fail on locked token:"
-cast send $RX "dispense(uint256)" 1 --rpc-url $RPC --private-key $PHARMACY_PK
-
-echo "      2. transfer should fail on locked token:"
-cast send $RX "transferFrom(address,address,uint256)" $PHARMACY $ADMIN 1 \
-    --rpc-url $RPC --private-key $PHARMACY_PK
-
+# echo "  - provision Prescriber role:"
+# cast send $REGISTRY "addPrescriber(address,bytes32)" $PRESCRIBER $LICENSE \
+#   --rpc-url $RPC --private-key $ADMIN_PK
+#
+# echo "---"
+# echo ""
+#
+# echo "  - provision Pharmacy role:"
+# cast send $REGISTRY "addPharmacy(address)" $PHARMACY \
+#   --rpc-url $RPC --private-key $ADMIN_PK
+#
+# echo "---"
+# echo ""
+#
+# # confirm
+# echo "checking 'isPrescriber' for prescriber role:"
+# cast call $REGISTRY "isPrescriber(address)(bool)" $PRESCRIBER --rpc-url $RPC    # == true 
+# echo ""
+#
+# echo "checking 'isPharmacy' for pharmacy role:"
+# cast call $REGISTRY "isPharmacy(address)(bool)" $PHARMACY --rpc-url $RPC        # == true
+# echo ""
+#
+# echo ""
+# echo "==========================================================================="
+# echo "2. minting (or prescribing or whatever)"
+# echo "==========================================================================="
+# echo ""
+#
+# # 2. prescribe (i.e. mint)
+# #       a. build encoded fields:
+# echo "encoding patient hash, medication, expiration..."
+# PATIENT_HASH=$(cast keccak "ihi-8003608166690503:per-patient-salt")
+# MED=$(cast format-bytes32-string "PBS0001DK")
+# EXPIRY=$(( $(date +%s) + 2592000 )) # current unix timestamp + 30 days in seconds 
+# echo "ok."
+# echo ""
+#
+# #       b. call `mint()`
+# #
+# # noting that while `mint()` returns the tokenId, `cast send` provides us with a receipt
+# # and NOT the return value. 
+# # we can pull from the `Transfer` event, with the tokenId as the fourth indexed topic
+#
+# echo "calling 'mint()'..."
+# # function mint(address to, bytes32 patientId, bytes32 medicationCode, uint32 dosage, uint8 repeats, uint64 expiry)
+# TX=$(cast send $RX "mint(address,bytes32,bytes32,uint32,uint8,uint64)" \
+#     $PATIENT $PATIENT_HASH $MED 500 1 $EXPIRY \
+#     --rpc-url $RPC --private-key $PRESCRIBER_PK \
+#     --json | jq -r .transactionHash)
+#
+# echo "retrieving tokenId..."
+# TOKEN_ID=$(cast receipt $TX --rpc-url $RPC --json \
+#     | jq -r '.logs[] | select(.topics[0]="0xddf252ad1be2c89b69c2b068fc378daa952ba7f163c4a11628f55a4df523b3ef") | .topics[3]' \
+#     | cast to-dec)
+#
+# echo "minted tokenId=$TOKEN_ID"
+#
+# # + read the stored prescription back
+# #
+# echo "stored prescription:"
+# cast call $RX \
+#   "getPrescription(uint256)((bytes32,bytes32,address,bytes32,uint32,uint8,uint8,uint64,bool))" \
+#   1 --rpc-url $RPC
+#
+# echo ""
+# echo "==========================================================================="
+# echo "3. transferring"
+# echo "==========================================================================="
+# echo ""
+#
+# # 3. transfer
+# # contract checks:
+# #   - recipient is a valid pharmacy
+# #   - token is not locked or expired
+# cast send $RX "transferFrom(address,address,uint256)" $PATIENT $PHARMACY 1 \
+#     --rpc-url $RPC --private-key $PATIENT_PK
+#
+# echo ""
+#
+# cast call $RX "ownerOf(uint256)(address)" 1 --rpc-url $RPC      # == $PHARMACY
+#
+#
+#
+# # b. double-check guarding by attempting to send somewhere illegal
+# #       - SHOULD revert with `RecipientNotPharmacy`
+# echo ""
+# echo "attempt to send to non-pharmacy should revert:"
+# cast send $RX "transferFrom(address,address,uint256)" $PATIENT $ADMIN 1\
+#     --rpc-url $RPC --private-key $PATIENT_PK
+#
+# echo ""
+# echo "==========================================================================="
+# echo "4. dispensing"
+# echo "==========================================================================="
+# echo ""
+#
+# # 4. dispense
+# echo "dispensing:"
+# cast send $RX "dispense(uint256)" 1 --rpc-url $RPC --private-key $PHARMACY_PK
+#
+# # `repeatsRemaining` and `locked` are the 6th and 9th tuple fields:
+# echo "retrieving prescription details:"
+# cast call $RX \
+#   "getPrescription(uint256)((bytes32,bytes32,address,bytes32,uint32,uint8,uint8,uint64,bool))" \
+#   1 --rpc-url $RPC
+#
+#
+# echo ""
+# echo "check locking mechanism - should revert:"
+# echo "      1. dispense should fail on locked token:"
+# cast send $RX "dispense(uint256)" 1 --rpc-url $RPC --private-key $PHARMACY_PK
+#
+# echo "      2. transfer should fail on locked token:"
+# cast send $RX "transferFrom(address,address,uint256)" $PHARMACY $ADMIN 1 \
+#     --rpc-url $RPC --private-key $PHARMACY_PK
+#

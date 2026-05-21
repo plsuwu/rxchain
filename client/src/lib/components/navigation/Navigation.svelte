@@ -20,7 +20,7 @@
 	<div class="flex flex-row items-center">
 		<a
 			href="/"
-			class="cursor-pointer px-4 mx-8 text-2xl font-bold
+			class="mx-8 cursor-pointer px-4 text-2xl font-bold
             transition-opacity duration-250 ease-out hover:opacity-25"
 			>RxChain</a
 		>
@@ -28,7 +28,7 @@
 			{#each routes as route, idx}
 				<a
 					href={route.href}
-					class="transition-opacity duration-150 ease-out hover:opacity-65 underline-offset-4"
+					class="underline-offset-4 transition-opacity duration-150 ease-out hover:opacity-65"
 					class:underline={page.route.id?.startsWith(`${route.href}`)}
 					id={idx.toString()}
 				>
@@ -38,9 +38,16 @@
 		</div>
 	</div>
 	<div class="flex flex-row items-center">
+		<a
+			href="/admin"
+			class="mx-4 text-xs
+            transition-opacity duration-250 ease-out hover:opacity-25"
+		>
+			TGA
+		</a>
 		<button
 			onclick={toggleMode}
-			class="cursor-pointer px-2 mx-2 transition-opacity duration-150 ease-out hover:opacity-65"
+			class="mx-2 cursor-pointer px-2 transition-opacity duration-150 ease-out hover:opacity-65"
 		>
 			{#if mode.current === "dark"}
 				<Sun size={16} />

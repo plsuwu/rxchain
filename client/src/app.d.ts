@@ -3,7 +3,10 @@
 declare global {
 	namespace App {
 		// interface Error {}
-		// interface Locals {}
+		interface Locals {
+            loggedIn: boolean;
+            userType?: "admin" | "patient" | "pharmacy" | "prescriber";
+        }
 		// interface PageData {}
 		// interface PageState {}
 		// interface Platform {}
