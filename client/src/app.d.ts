@@ -4,9 +4,12 @@ declare global {
 	namespace App {
 		// interface Error {}
 		interface Locals {
-            loggedIn: boolean;
-            userType?: "admin" | "patient" | "pharmacy" | "prescriber";
-        }
+			user: {
+				id: number;
+				email: string;
+				role: Role;
+			} | null;
+		}
 		// interface PageData {}
 		// interface PageState {}
 		// interface Platform {}
