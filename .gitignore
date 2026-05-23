@@ -24,3 +24,14 @@ docs/
 
 # Soldeer
 /dependencies
+
+# Sveltekit
+.svelte-kit/
+.vscode/
+node_modules/
+
+# Cargo
+target/
+
+networkFiles/
+qbftConfigFile.json

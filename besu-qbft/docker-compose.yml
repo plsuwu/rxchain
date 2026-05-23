@@ -1,0 +1,41 @@
+services:
+  besu:
+    image: hyperledger/besu:latest
+    container_name: besu-dev
+    restart: unless-stopped
+    ports:
+      - "8545:8545"
+      - "8546:8546"
+      - "30303:30303"
+      - "30303:30303/udp"
+    volumes:
+      - ./genesis.json:/opt/besu/genesis.json:ro
+      - ./node:/opt/besu/keys:ro
+      - besu-data:/opt/besu/data
+    command:
+      - --genesis-file=/opt/besu/genesis.json
+      - --node-private-key-file=/opt/besu/keys/key
+      - --data-path=/opt/besu/data
+      - --rpc-http-enabled
+      - --rpc-http-host=0.0.0.0
+      - --rpc-http-port=8545
+      - --rpc-http-api=ETH,NET,WEB3,QBFT,DEBUG,TRACE,TXPOOL
+      - --rpc-ws-enabled
+      - --rpc-ws-host=0.0.0.0
+      - --rpc-ws-port=8546
+      - --rpc-ws-api=ETH,NET,WEB3
+      - --host-allowlist=*
+      - --rpc-http-cors-origins=all
+      - --p2p-host=0.0.0.0
+      - --p2p-port=30303
+      - --min-gas-price=0
+      - --logging=INFO
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf -X POST -H 'Content-Type: application/json' --data '{\"jsonrpc\":\"2.0\",\"method\":\"net_version\",\"id\":1}' http://localhost:8545 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  besu-data:
