@@ -11,7 +11,7 @@ const FALLBACK_ADDRESS =
 
 export const consortium = defineChain({
 	id: CHAIN_ID,
-	name: "Prescription Consortium (dev)",
+	name: "Prescription Consortium",
 	nativeCurrency: { name: "Gas", symbol: "GAS", decimals: 18 },
 	rpcUrls: { default: { http: [RPC_URL] } },
 });

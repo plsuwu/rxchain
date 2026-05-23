@@ -1,7 +1,7 @@
 import type { Address } from "viem";
 import { keccak256, parseEventLogs, stringToHex, toBytes } from "viem";
 
-import { findMedicationById } from "$lib/utils";
+import { findMedicationById } from "$lib/server/db/handlers";
 import { walletForUser } from "$lib/server/wallet";
 import { consortium, RX_ADDRESS } from "$lib/server/chain";
 import { prescriptionDispenseAbi } from "$lib/server/generated";

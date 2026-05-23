@@ -34,20 +34,26 @@ impl Db {
                     product_name,
                     manufacturer,
                     active_ingredient,
-                    effective
+                    effective,
+                    created_at,
+                    updated_at
                 ) 
                 VALUES (
                     :id,
                     :product,
                     :manufacturer,
                     :ingredient,
-                    :effective
+                    :effective,
+                    :created,
+                    :updated
                 )
                 ON CONFLICT (id)
                 DO NOTHING
                 ",
                 self.table_name
             ))?;
+
+            let ts_now = chrono::Utc::now().timestamp();
 
             for row in rows {
                 statement.execute(named_params! {
@@ -56,6 +62,8 @@ impl Db {
                     ":manufacturer": row.manufacturer,
                     ":ingredient": row.active_ingredient,
                     ":effective": row.effective_timestamp as u32,
+                    ":created": ts_now,
+                    ":updated": ts_now,
                 })?;
             }
         }

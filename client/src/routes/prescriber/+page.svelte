@@ -1,5 +1,4 @@
 <script lang="ts">
-	import { PlusIcon } from "@lucide/svelte";
 	import Prescribe from "$lib/components/modal/Prescribe.svelte";
 	import MedicationTable from "$lib/components/medication-table/MedicationTable.svelte";
 
@@ -13,7 +12,7 @@
 		updatedAt: number;
 	};
 
-	let { form } = $props();
+	let { data, form } = $props();
 
 	let selected: Partial<MedicationSearchResult> | null = $state(null);
 	let searchResults: MedicationSearchResult[] | null = $derived.by(() => {
@@ -39,13 +38,21 @@
 	}
 </script>
 
+<div>
+	<div
+		class="mt-8 mb-18 flex flex-col items-center text-6xl font-bold tracking-tighter"
+	>
+		Prescribe
+	</div>
+</div>
+
 {#if selected != null}
 	<Prescribe
 		id={selected.id}
 		productName={selected.productName}
 		manufacturer={selected.manufacturer}
 		activeIngredient={selected.activeIngredient}
-		effective={selected.effective}
+		patients={data.patients}
 		{handleDismiss}
 	/>
 {/if}

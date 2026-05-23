@@ -31,8 +31,9 @@ export const actions = {
 				return fail(400, { error: "AHPRA ID is required for prescribers" });
 			}
 		} else if (role === "pharmacy") {
-			extra.tga = String(formData.get("tga-id") ?? "").trim();
-			if (extra.tga === "") {
+			extra.tgaId = String(formData.get("tga-id") ?? "").trim();
+            console.log(extra.tgaId);
+			if (extra.tgaId === "") {
 				return fail(400, { error: "TGA ID is required for pharmacies" });
 			}
 		}

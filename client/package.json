@@ -17,7 +17,8 @@
 		"db:push": "drizzle-kit push",
 		"db:generate": "drizzle-kit generate",
 		"db:migrate": "drizzle-kit migrate",
-		"db:studio": "drizzle-kit studio"
+		"db:studio": "drizzle-kit studio",
+		"seed:admin": "node --env-file=.env --import tsx script/seed-admin.ts"
 	},
 	"devDependencies": {
 		"@fontsource-variable/geist": "^5.2.9",
@@ -50,6 +51,8 @@
 	},
 	"dependencies": {
 		"@lucide/svelte": "^1.16.0",
+		"@node-rs/argon2": "^2.0.2",
+		"@oslojs/binary": "^1.0.0",
 		"@oslojs/crypto": "^1.0.1",
 		"@oslojs/encoding": "^1.1.0",
 		"@wagmi/core": "^3.4.12",

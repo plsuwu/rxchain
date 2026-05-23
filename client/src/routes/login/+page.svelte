@@ -29,7 +29,7 @@
 
 <div class="flex w-full flex-col">
 	<div
-		class="mt-8 mb-18 flex flex-col items-center text-4xl font-bold tracking-tighter"
+		class="mt-8 mb-18 flex flex-col items-center text-6xl font-bold tracking-tighter"
 	>
 		Sign in
 	</div>

@@ -59,6 +59,7 @@ export async function walletForUser(userId: number): Promise<WalletClient> {
 		where: eq(wallets.userId, userId),
 	});
 	if (!row) throw new Error(`no wallet for user ${userId}`);
+
 	const account = privateKeyToAccount(
 		decryptKey(row.encryptedKey) as `0x${string}`
 	);
@@ -69,5 +70,7 @@ export async function addressForUser(userId: number): Promise<Address | null> {
 	const row = await db.query.wallets.findFirst({
 		where: eq(wallets.userId, userId),
 	});
+	console.log("address for user: ", userId, row?.address);
+
 	return (row?.address as Address) ?? null;
 }

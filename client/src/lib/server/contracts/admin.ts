@@ -24,7 +24,11 @@ export class Registry {
 		this.#adminWallet = adminWallet;
 	}
 
-	async authorize(userAddress: Address, role: ActionableRole, ahpraId: string) {
+	async authorize(
+		userAddress: Address,
+		role: ActionableRole,
+		ahpraId?: string
+	) {
 		if (role !== "prescriber" && role !== "pharmacy") {
 			throw new Error(`Invalid role: cannot authorize '${role}'`);
 		}
@@ -48,6 +52,8 @@ export class Registry {
 				functionName: "addPharmacy",
 				args: [userAddress],
 			});
+
+            console.log(hash);
 		}
 
 		return waitOk(hash);

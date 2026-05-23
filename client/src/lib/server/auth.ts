@@ -57,6 +57,7 @@ export async function register(input: RegisterInput) {
 	const existing = await db.query.users.findFirst({
 		where: eq(users.email, input.email),
 	});
+
 	if (existing) throw new Error("An account with that email already exists.");
 
 	const user = db
@@ -81,7 +82,6 @@ export async function register(input: RegisterInput) {
 		await db.insert(pharmacyCredentials).values({
 			userId: user.id,
 			tgaId: input.tgaId!,
-			name: input.pharmacyName!,
 		});
 	}
 

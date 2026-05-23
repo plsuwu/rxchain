@@ -22,7 +22,7 @@ abstract contract PrescriptionMint is ERC721 {
 
     mapping(uint256 => PrescriptionData) internal _prescriptions;
 
-    event PrescriptionMinted(uint256 indexed tokenId, address indexed prescriber, bytes32 patientId);
+    event PrescriptionMinted(uint256 indexed tokenId, address indexed to, bytes32 indexed patientIdHash, uint64 expiry);
 
     error NotAuthorizedPrescriber();
     error InvalidExpiry();
@@ -65,7 +65,7 @@ abstract contract PrescriptionMint is ERC721 {
         });
 
         _safeMint(to, tokenId);
-        emit PrescriptionMinted(tokenId, msg.sender, patientId);
+        emit PrescriptionMinted(tokenId, msg.sender, patientId, expiry);
     }
 
     function getPrescription(uint256 tokenId) external view returns (PrescriptionData memory) {

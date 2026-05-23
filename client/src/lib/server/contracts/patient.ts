@@ -24,3 +24,14 @@ export async function transferToPharmacy(
 
 	return waitOk(hash);
 }
+
+export async function getPrescriptions(
+	patientUserId: number,
+	patientAddress: Address
+) {
+	const wallet = await walletForUser(patientUserId);
+	const addrs = wallet.chain?.id
+
+	console.log(addrs);
+	return [];
+}

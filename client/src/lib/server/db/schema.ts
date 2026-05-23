@@ -74,7 +74,6 @@ export const pharmacyCredentials = sqliteTable("pharmacy_credentials", {
 		.references(() => users.id)
 		.unique(),
 	tgaId: text("tga_id").notNull().unique(),
-	name: text("name").notNull(),
 	onChainStatus: text("on_chain_status", {
 		enum: ["pending", "active", "revoked"],
 	})

@@ -9,7 +9,7 @@ pub mod parser;
 // assume files are all available in the current working dir,
 // functionality can be expanded upon later if necessary.
 const REGISTRY_XLSX: &str = "tga-registry.xlsx";
-const DATABASE_FILENAME: &str = "../client/src/lib/server/db/tga_registry.db";
+const DATABASE_FILENAME: &str = "../client/src/lib/server/db/sqlite.db";
 
 fn main() {
     let registry_filepath = PathBuf::from(REGISTRY_XLSX);

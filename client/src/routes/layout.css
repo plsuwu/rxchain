@@ -1,11 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=PT+Sans:ital,wght@0,400;0,700;1,400;1,700&family=Work+Sans:ital,wght@0,100..900;1,100..900&display=swap');
 
 @import 'tailwindcss';
-
 @import "tw-animate-css";
 
 @import "shadcn-svelte/tailwind.css";
-
 @import "@fontsource-variable/geist";
 
 @custom-variant dark (&:where(.dark, .dark *));
@@ -122,18 +120,20 @@
 }
 
 @layer base {
-	* {
-		@apply border-border outline-ring/50;
-    }
-	body {
-		@apply bg-background text-foreground;
-    }
-	html {
-		@apply font-sans;
+    * {
+        @apply border-border outline-ring/50;
     }
 
-	::selection {
-		background-color: var(--color-foreground);
-		color: var(--color-background);
-	}
+    body {
+        @apply bg-background text-foreground w-screen h-screen;
+    }
+
+    html {
+        @apply font-sans;
+    }
+
+    ::selection {
+        background-color: var(--color-foreground);
+        color: var(--color-background);
+    }
 }
