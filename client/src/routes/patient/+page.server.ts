@@ -1,6 +1,6 @@
 import type { Address } from "viem";
 import type { Actions, PageServerLoad } from "./$types";
-import { fail } from "@sveltejs/kit";
+import { fail, error } from "@sveltejs/kit";
 import {
 	findMedicationById,
 	verifiedPharmacies,
@@ -15,21 +15,23 @@ import {
 
 export const load: PageServerLoad = async ({ locals }) => {
 	const user = requireRole(locals.user, "patient");
-	const address = await addressForUser(user.id);
 
-	const prescriptions = await prescriptionsOwnedBy(address!);
-	const pharmacies = await verifiedPharmacies();
+	try {
+		const address = await addressForUser(user.id);
+		const prescriptions = await prescriptionsOwnedBy(address!);
+		const pharmacies = await verifiedPharmacies();
 
-	console.log(prescriptions);
-
-	return {
-		address,
-		pharmacies,
-		prescriptions: prescriptions.map((p) => ({
-			...p,
-			tokenId: p.tokenId.toString(),
-		})),
-	};
+		return {
+			address,
+			pharmacies,
+			prescriptions: prescriptions.map((p) => ({
+				...p,
+				tokenId: p.tokenId.toString(),
+			})),
+		};
+	} catch (err) {
+		console.error(err);
+	}
 };
 
 export const actions: Actions = {

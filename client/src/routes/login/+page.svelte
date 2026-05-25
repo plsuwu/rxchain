@@ -1,7 +1,9 @@
 <script lang="ts">
 	import type { FullAutoFill } from "svelte/elements";
 	import { enhance } from "$app/forms";
+	import { loadUtil } from "$lib/store-utils.svelte.js";
 	import { UserPlusIcon } from "@lucide/svelte";
+	import Error from "$lib/components/error/Error.svelte";
 	let { form } = $props();
 
 	let errored = $derived(form?.error);
@@ -20,7 +22,7 @@
 		type={inputType}
 		id={inputName}
 		name={inputName}
-        {autocomplete}
+		{autocomplete}
 		{placeholder}
 		class="mb-2 w-full border border-muted-foreground/50 px-2 py-1 ring-0 outline-0 transition-all
         duration-200 ease-in placeholder:text-sm focus:border-foreground focus:ring-0 focus-visible:outline-0"
@@ -34,7 +36,14 @@
 		Sign in
 	</div>
 	<form
-		use:enhance
+		use:enhance={() => {
+			loadUtil.wait();
+
+			return async ({ update }) => {
+				await update();
+				loadUtil.unwait();
+			};
+		}}
 		method="post"
 		class="flex w-[350px] flex-col items-center space-y-2 self-center"
 	>
@@ -62,4 +71,5 @@
 			>
 		</div>
 	</form>
+    <Error {errored} {form} />
 </div>

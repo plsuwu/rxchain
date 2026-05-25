@@ -1,6 +1,8 @@
 <script lang="ts">
+	import { enhance } from "$app/forms";
 	import { page } from "$app/state";
-	import { CircleUserIcon, Moon, Sun, UserCircleIcon } from "@lucide/svelte";
+	import { loadUtil } from "$lib/store-utils.svelte";
+	import { CircleUserIcon, LogOut, Moon, Sun } from "@lucide/svelte";
 	import { mode, setMode } from "mode-watcher";
 
 	let { user }: { user: App.Locals["user"] } = $props();
@@ -46,13 +48,28 @@
 	</div>
 	<div class="flex flex-row items-center">
 		{#if user}
-			<form action="/logout" method="POST">
+			<div>
+				<span class="text-muted-foreground">logged in as:</span>
+				<span class="font-medium">{user.email}</span>
+			</div>
+			<form
+				action="/logout"
+				method="POST"
+				use:enhance={() => {
+					loadUtil.wait();
+
+					return async ({ update }) => {
+						await update();
+						loadUtil.unwait();
+					};
+				}}
+			>
 				<button
 					type="submit"
-					class="flex flex-row items-center self-end py-0 hover:underline"
+					class="ml-4 flex cursor-pointer flex-row items-center self-end py-0
+                    transition-opacity duration-200 ease-out hover:opacity-50"
 				>
-					<CircleUserIcon size={20} strokeWidth={1} class="mr-2" />
-					<div>{user.email}</div>
+					<LogOut size={18} />
 				</button>
 			</form>
 		{/if}

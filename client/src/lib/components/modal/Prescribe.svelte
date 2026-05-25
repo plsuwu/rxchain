@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { fade } from "svelte/transition";
 	import { enhance } from "$app/forms";
+	import { loadUtil } from "$lib/store-utils.svelte";
 
 	let {
 		id,
@@ -33,7 +34,19 @@
 		class="z-20 flex h-3/4 w-2/3 flex-row self-center justify-self-center
         rounded-md bg-card p-10 text-card-foreground"
 	>
-		<form method="post" action="?/mint" class="h-full w-full" use:enhance>
+		<form
+			method="post"
+			action="?/mint"
+			class="h-full w-full"
+			use:enhance={() => {
+				loadUtil.wait();
+
+				return async ({ update }) => {
+					await update();
+					loadUtil.unwait();
+				};
+			}}
+		>
 			<div class="flex w-full flex-row justify-between">
 				<div class="flex flex-col">
 					<label

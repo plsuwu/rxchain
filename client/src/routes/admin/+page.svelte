@@ -1,6 +1,9 @@
 <script lang="ts">
+	import { loadUtil } from "$lib/store-utils.svelte";
 	import { enhance } from "$app/forms";
+	import Error from "$lib/components/error/Error.svelte";
 	let { data, form } = $props();
+    let errored = $derived(form?.error);
 </script>
 
 <div class="flex w-full flex-col px-8">
@@ -9,6 +12,7 @@
 	>
 		Verify & Revoke
 	</div>
+    <Error {errored} {form} />
 
 	<div class="mb-4 flex flex-col text-3xl underline underline-offset-2">
 		prescribers
@@ -35,7 +39,18 @@
 					>
 					<td>
 						{#if p.status === "active"}
-							<form method="POST" action="?/revokePrescriber" use:enhance>
+							<form
+								method="POST"
+								action="?/revokePrescriber"
+								use:enhance={() => {
+									loadUtil.wait();
+
+									return async ({ update }) => {
+										await update();
+										loadUtil.unwait();
+									};
+								}}
+							>
 								<input type="hidden" name="user-id" value={p.userId} />
 								<button
 									type="submit"
@@ -46,7 +61,18 @@
 							</form>
 						{:else}
 							<div class="flex flex-row self-start">
-								<form method="POST" action="?/verifyPrescriber" use:enhance>
+								<form
+									method="POST"
+									action="?/verifyPrescriber"
+									use:enhance={() => {
+										loadUtil.wait();
+
+										return async ({ update }) => {
+											await update();
+											loadUtil.unwait();
+										};
+									}}
+								>
 									<input type="hidden" name="user-id" value={p.userId} />
 									<button
 										type="submit"
@@ -56,7 +82,18 @@
 									>
 								</form>
 								<div>/</div>
-								<form method="POST" action="?/rejectPrescriber" use:enhance>
+								<form
+									method="POST"
+									action="?/rejectPrescriber"
+									use:enhance={() => {
+										loadUtil.wait();
+
+										return async ({ update }) => {
+											await update();
+											loadUtil.unwait();
+										};
+									}}
+								>
 									<button
 										class="cursor-pointer px-3 underline underline-offset-3 transition-opacity
                                         duration-200 ease-out not-disabled:hover:opacity-50 disabled:cursor-not-allowed
@@ -96,7 +133,18 @@
 					>
 					<td>
 						{#if p.status === "active"}
-							<form method="POST" action="?/revokePharmacy" use:enhance>
+							<form
+								method="POST"
+								action="?/revokePharmacy"
+								use:enhance={() => {
+									loadUtil.wait();
+
+									return async ({ update }) => {
+										await update();
+										loadUtil.unwait();
+									};
+								}}
+							>
 								<input type="hidden" name="user-id" value={p.userId} />
 								<button
 									type="submit"
@@ -107,7 +155,18 @@
 							</form>
 						{:else}
 							<div class="flex flex-row self-start">
-								<form method="POST" action="?/verifyPharmacy" use:enhance>
+								<form
+									method="POST"
+									action="?/verifyPharmacy"
+									use:enhance={() => {
+										loadUtil.wait();
+
+										return async ({ update }) => {
+											await update();
+											loadUtil.unwait();
+										};
+									}}
+								>
 									<input type="hidden" name="user-id" value={p.userId} />
 									<input type="hidden" name="ahpra-id" value={p.tgaId} />
 									<button
@@ -118,7 +177,18 @@
 									>
 								</form>
 								<div>/</div>
-								<form method="POST" action="?/rejectPharmacy" use:enhance>
+								<form
+									method="POST"
+									action="?/rejectPharmacy"
+									use:enhance={() => {
+										loadUtil.wait();
+
+										return async ({ update }) => {
+											await update();
+											loadUtil.unwait();
+										};
+									}}
+								>
 									<button
 										class="cursor-pointer px-3 underline underline-offset-3 transition-opacity
                                         duration-200 ease-out not-disabled:hover:opacity-50 disabled:cursor-not-allowed
