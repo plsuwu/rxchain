@@ -45,6 +45,10 @@ export const actions = {
 			return { status: 204 };
 		} catch (err) {
 			console.error("[/login][ACTION::default] error:", err);
+			if ((err as Error).message.includes("invalid email")) {
+				return fail(400, { error: "invalid email or password" });
+			}
+
 			return fail(500, { error: "internal server error" });
 		}
 	},

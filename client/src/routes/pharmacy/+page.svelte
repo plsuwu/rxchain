@@ -1,9 +1,14 @@
 <script lang="ts">
 	import { enhance } from "$app/forms";
+	import Error from "$lib/components/error/Error.svelte";
+	import { loadUtil } from "$lib/store-utils.svelte.js";
 	let { data, form } = $props();
+
+	let errored = $derived(form?.error);
 </script>
 
 <div class="w-full px-4">
+	<Error {errored} {form} />
 	<div class="mb-4 text-2xl font-semibold tracking-tight">
 		Held prescriptions
 	</div>
@@ -42,7 +47,18 @@
 							{#if p.locked}
 								<span class="text-muted-foreground/70">fully dispensed</span>
 							{:else}
-								<form method="POST" action="?/dispense" use:enhance>
+								<form
+									method="POST"
+									action="?/dispense"
+									use:enhance={() => {
+										loadUtil.wait();
+
+										return async ({ update }) => {
+											await update();
+											loadUtil.unwait();
+										};
+									}}
+								>
 									<input type="hidden" name="token-id" value={p.tokenId} />
 									<button
 										class="cursor-pointer border px-2 py-px transition-all duration-200

@@ -1,6 +1,9 @@
 <script lang="ts">
 	import Prescribe from "$lib/components/modal/Prescribe.svelte";
 	import MedicationTable from "$lib/components/medication-table/MedicationTable.svelte";
+	import { enhance } from "$app/forms";
+	import { loadUtil } from "$lib/store-utils.svelte.js";
+	import Error from "$lib/components/error/Error.svelte";
 
 	type MedicationSearchResult = {
 		id: number;
@@ -13,6 +16,7 @@
 	};
 
 	let { data, form } = $props();
+    let errored = $derived(form?.error);
 
 	let selected: Partial<MedicationSearchResult> | null = $state(null);
 	let searchResults: MedicationSearchResult[] | null = $derived.by(() => {
@@ -36,6 +40,8 @@
 	function handleDismiss() {
 		selected = null;
 	}
+
+    
 </script>
 
 <div>
@@ -58,10 +64,19 @@
 {/if}
 
 <div class="flex w-full flex-col">
+	<Error {errored} {form} />
 	<form
 		action="?/search"
 		method="post"
 		class="flex w-[350px] flex-col items-center justify-center self-center"
+		use:enhance={() => {
+			loadUtil.wait();
+
+			return async ({ update }) => {
+				await update();
+				loadUtil.unwait();
+			};
+		}}
 	>
 		<input
 			id="search-query"

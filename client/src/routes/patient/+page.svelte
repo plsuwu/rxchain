@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from "$app/forms";
+	import { loadUtil } from "$lib/store-utils.svelte.js";
 	import { ClipboardIcon } from "@lucide/svelte";
 	import type { Hex } from "viem";
 	let { data, form } = $props();
@@ -96,9 +97,16 @@
 									<form
 										method="POST"
 										action="?/transfer"
-										use:enhance
 										class="row"
 										style="gap:.4rem"
+										use:enhance={() => {
+											loadUtil.wait();
+
+											return async ({ update }) => {
+												await update();
+												loadUtil.unwait();
+											};
+										}}
 									>
 										<input type="hidden" name="token-id" value={p.tokenId} />
 										<select
@@ -114,7 +122,9 @@
 												>
 											{/each}
 										</select>
-										<button type="submit" class="border px-2 py-px text-sm hover:bg-background/50"
+										<button
+											type="submit"
+											class="border px-2 py-px text-sm hover:bg-background/50"
 											>send</button
 										>
 									</form>

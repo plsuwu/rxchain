@@ -30,9 +30,34 @@
         };
 
         craneLib = crane.mkLib pkgs;
+
+        client = pkgs.buildNpmPackage {
+          pname = "ifb452-client";
+          version = "0.0.1";
+          src = "./client";
+
+          npmDepsHash = "sha256-zqBjLXnz4hCZV5elDNBMoi954afDYHXqK+csSds7Y5w=";
+
+          buildPhase = ''
+            npm install 
+            npm run build -- --sourcemap
+
+            rm -rf ./node_modules
+            npm install --omit dev
+          '';
+
+          installPhase = ''
+            mkdir -p $out
+            cp -R ./node_modules $out/
+            cp -R ./build $out/
+          '';
+        };
       in
       {
-        # devShells.default = pkgs.mkShell {
+        packages = {
+          default = client;
+        };
+
         devShells.default = craneLib.devShell {
           buildInputs = with pkgs; [
             pkg-config

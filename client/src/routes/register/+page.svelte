@@ -3,6 +3,8 @@
 	import { enhance } from "$app/forms";
 	import { UserKeyIcon } from "@lucide/svelte";
 	import { slide } from "svelte/transition";
+	import { loadUtil } from "$lib/store-utils.svelte.js";
+	import Error from "$lib/components/error/Error.svelte";
 	let { form } = $props();
 
 	let role = $state("patient");
@@ -38,9 +40,16 @@
 	</div>
 
 	<form
-		use:enhance
 		method="post"
 		class="flex w-[350px] flex-col items-center space-y-2 self-center"
+		use:enhance={() => {
+			loadUtil.wait();
+
+			return async ({ update }) => {
+				await update();
+				loadUtil.unwait();
+			};
+		}}
 	>
 		{@render InputWithLabel("email", "email")}
 		{@render InputWithLabel("password", "new-password", "password")}
@@ -96,21 +105,24 @@
 
 			<button
 				type="submit"
-				class="mx-4 border border-muted-foreground px-4 py-0.5 text-lg opacity-50 transition-opacity duration-200 ease-out hover:opacity-100"
+				class="mx-4 border border-muted-foreground px-4 py-0.5 text-lg opacity-50 transition-opacity duration-200
+                ease-out hover:opacity-100"
 			>
 				create</button
 			>
 		</div>
 	</form>
-	{#if errored}
-		<div
-			class="mt-12 flex w-[300px] flex-col items-start justify-start space-y-1 self-center rounded border border-destructive px-4 py-2 text-destructive"
-		>
-			<div class="w-full text-center text-xl font-bold tracking-tight">
-				an error occurred:
-			</div>
-
-			<div class="w-full text-center">{form?.error}.</div>
-		</div>
-	{/if}
+	<Error {errored} {form} />
+	<!-- {#if errored} -->
+	<!-- 	<div -->
+	<!-- 		class="mt-12 flex w-[300px] flex-col items-start justify-start space-y-1 self-center rounded border border-destructive  -->
+	<!--            px-4 py-2 text-destructive" -->
+	<!-- 	> -->
+	<!-- 		<div class="w-full text-center text-xl font-bold tracking-tight"> -->
+	<!-- 			an error occurred: -->
+	<!-- 		</div> -->
+	<!---->
+	<!-- 		<div class="w-full text-center">{form?.error}.</div> -->
+	<!-- 	</div> -->
+	<!-- {/if} -->
 </div>
