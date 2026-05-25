@@ -5,7 +5,7 @@ libs = ["dependencies"]
 
 [soldeer]
 remappings_generate = true
-remappings_regenerate = true
+remappings_regenerate = false 
 remappings_version = false
 
 [dependencies]

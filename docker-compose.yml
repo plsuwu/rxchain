@@ -1,0 +1,27 @@
+include:
+  - path: ./besu-qbft/besu-compose.yml
+
+services:
+  client:
+    build:
+      context: .
+      dockerfile: client/Dockerfile
+    environment:
+      DATABASE_URL: "/usr/src/rx/sqlite.db"
+      RPC_URL: "http://besu:8545"
+    ports: 
+      - "3000:3000"
+    # depends_on:
+    #   run-deploy:
+    #     condition: service_completed_successfully
+
+
+  run-deploy:
+    image: ghcr.io/foundry-rs/foundry
+    volumes:
+      - ${PWD}:/rx
+    entrypoint: ["/bin/bash", "/rx/deploy.sh"]
+    restart: "no"
+    depends_on:
+      besu:
+        condition: service_healthy

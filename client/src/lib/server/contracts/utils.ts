@@ -21,7 +21,10 @@ export const isPrescriberOnChain = (addr: Address) => {
 };
 
 export const isPharmacyOnChain = (addr: Address) => {
-	return registry.read.isPharmacy([addr]);
+	const pharm = registry.read.isPharmacy([addr]);
+    // console.log("is pharmacy on chain:", pharm);
+
+    return pharm
 };
 
 export async function waitOk(hash: Hash) {
