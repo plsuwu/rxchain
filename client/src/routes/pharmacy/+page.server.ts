@@ -16,6 +16,8 @@ export const load: PageServerLoad = async ({ locals }) => {
 	const verified = address
 		? await isPharmacyOnChain(address as Address)
 		: false;
+
+    console.log("is verified:", verified);
 	const held =
 		verified && address ? await prescriptionsOwnedBy(address as Address) : [];
 	return {
