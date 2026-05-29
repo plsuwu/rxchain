@@ -1,89 +1,74 @@
-# RxChain
+# RxChain 
 
-IFB452 Blockchain project
+> IFB452 (Blockchain Technology) A3
 
-## Creating a TGA medications registry database
+This project was set up to be served at [rx.rat.moe](https://rx.rat.moe) for the presentation - feel free to poke around here, but please note that there is a high possibility of availability issues, so please check the footnote[^1] if you cannot connect.
 
-I think this was probably the wrong approach but here we are. 
+## Solidity Contract Setup
 
-**Also note this shouldn't _actually_ be necessary as I am gonna just commit the DB but for reference:**
+> [!IMPORTANT]  
+>  You will most likely have to delete `remappings.txt` in order for Remix to correctly resolve OpenZeppelin `npm` packages - you will probably also have other issues (e.g. `CREATE2` determinism functionality) if you attempt to deploy with Remix, however.
 
-### Sourcing a list of medications
+This project was built using [Foundry](https://www.getfoundry.sh/) to make the development process a little easier; I run NixOS so getting Remix downloaded locally is tricky, and browser-based Remix is not viable on account of the use of Hyperledger Besu: 
 
-The TGA has a PowerBI search visualisation tool that we can use to dump an Excel spreadsheet with a list 
-of all TGA-approved medications:
+<img width="756" height="258" alt="image" src="https://github.com/user-attachments/assets/ff9e4a9d-9db3-4831-94d8-92a73d267e9e" />
 
-1. Open the tool (https://compliance.health.gov.au/artg/)
-2. Select 'Medicines' on the left
-3. The exact categories probably doesn't matter for this project, so you can just export this as it is:
-    - On the top right corner of the table, there is a little menu that you need to hover to see
-    - Click the three dots, and select export data
-    - I think either option is fine (current layout vs. summarized data), but summarized is a closer match (i think)
-    - Click export - it'll process this for a bit and then download the spreadsheet
-4. Move the downloaded spreadsheet into the `tga-registry/` directory to process it into a SQLite DB
+As such, included instructions are pertinent to Foundry ([install docs](https://www.getfoundry.sh/introduction/installation)).
 
-### Converting the XLSX spreadsheet to a SQLite database
+### 1. Starting the Besu Network
 
-1. Make sure `cargo` is installed (see the install link above; Rustup should generally handle the toolchain
-installation such that it Just Works[^tm])
-2. Open the [`tga-registry`](./tga-registry) directory in a shell window (Powershell, Bash, whatever)
-3. Assuming the Excel spreadsheet is in the same directory as you are, you should be able to run `cargo run` and it will dump a populated SQLite database next to the spreadsheet.
-4. Move the database into the `client/` directory and create a `.env` file with a `DATABASE_URL` var pointing to the db file:
+In order to properly deploy these contracts, you will likely need to run the Besu network locally, and connect Remix to this. This repo has a Docker Compose configuration available, and should simply be a matter of installing `docker` and `docker-compose` ([Docker Compose install docs](https://docs.docker.com/compose/install/)) and running the config.
 
-    ```bash
-    # (e.g.)
-    
-    DATABASE_URL=path/to/tga_registry.db # or whatever it was called idk
-    ```
-
-## Besu Setup
-
-The commands below should already have been run with the output committed, so starting the network/chain/whatever
-is just a matter of running `docker compose up -d` in the `besu-qbft` directory. Additionally, the below is also
-the content of the `init.sh` script in `besu-qbft`. For the sake of documentation, however:
+Assuming Docker is installed, running the network should be a matter of simply cloning this repository, `cd`ing into it, and running `docker compose -f ./besu-qbft/besu-compose.yml up -d`:
 
 ```bash
-# create the qbft config base
-cat > qbftConfigFile.json <<'EOF'
-{
-  "genesis": {
-    "config": {
-      "chainId": 31337,
-      "shanghaiTime": 0,
-      "zeroBaseFee": true,
-      "qbft": { "blockperiodseconds": 2, "epochlength": 30000, "requesttimeoutseconds": 4 }
-    },
-    "nonce": "0x0",
-    "timestamp": "0x0",
-    "gasLimit": "0x1fffffffffffff",
-    "difficulty": "0x1",
-    "mixHash": "0x63746963616c2062797a616e74696e65206661756c7420746f6c6572616e6365",
-    "coinbase": "0x0000000000000000000000000000000000000000",
-    "alloc": {
-      "fe3b557e8fb62b89f4916b721be55ceb828dbd73": {
-        "balance": "0x200000000000000000000000000000000000000000000000000000000000000"
-      }
-    }
-  },
-  "blockchain": { "nodes": { "generate": true, "count": 1 } }
-}
-EOF
-
-# initialize the besu config
-docker run --rm -v "$PWD":/data hyperledger/besu:latest \
-  operator generate-blockchain-config \
-  --config-file=/data/qbftConfigFile.json \
-  --to=/data/networkFiles --private-key-file-name=key
-
-# move generated genesis & node key into place
-cp networkFiles/genesis.json .   
-mkdir -p node                
-cp networkFiles/keys/0x*/key node/key
+git clone https://github.com/plsuwu/rxchain
+cd rxchain
+docker compose -f ./besu-qbft/besu-compose.yml up -d
 ```
 
-Then run the `docker-compose.yml` to start the Hyperledger Besu chain: `docker compose up -d` 
 
-### Foundry Documentation
+### 2. Installing dependencies
 
-https://book.getfoundry.sh/
+In the repository root, install dependencies with `soldeer`:
 
+```bash
+forge soldeer install
+```
+
+Check that `remappings.txt` has not updated itself; it should look like the following:
+
+```
+@openzeppelin/contracts/=dependencies/@openzeppelin-contracts-5.6.1/
+forge-std/=dependencies/forge-std-1.16.0/src/
+```
+
+### 3. Contract Deployment
+
+Foundry's deployment scripts are Solidity contracts. In this project, they live in the  `/script` directory. Deploying is simply a matter of compiling the contracts and deploying them to the Besu network:
+
+```bash
+forge build
+forge script script/Deploy.s.sol:Deploy  \
+  --rpc-url http://localhost:8545        \
+  --broadcast
+```
+
+## Client side
+
+The client side is housed in `/client`. It is built on `SvelteKit` and *primarily* utilizes `viem` for smart contract/network interactivity (there is some `wagmi` usage as well).
+
+First, copy `.env.example` into a new `.env` - this only holds the path to the SQLite database, but without it the server won't start.
+
+Building this should be as simple as moving into the `/client` directory and (assuming `npm` and `node` are installed locally) installing dependencies with `npm install --omit=dev`, building with `npm run build`, and running the server with `node build/index`:
+
+```bash
+cd client &&          \
+  npm i --omit=dev && \
+  npm run build    && \
+  node build/index
+```
+
+Finally, note that being able to properly connect on `http://localhost:3000` requires the Besu network to be running with contracts fully deployed. 
+
+ [^1]: **On availability**: Hyperledger Besu tends to consume a lot of memory (in the context of a webservice, that is), and the VPS it is running on only has 1GB available to work with; realistically this means there is a good chance it will die. I will do my best to keep it alive, but please keep in mind that if you do go to connect and it won't load then it is very likely that Besu has triggered the out-of-memory killer and destroyed itself.
