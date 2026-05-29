@@ -25,11 +25,9 @@ export function verifyPassword(password: string, stored: string): boolean {
 /**
  * AES-256-GCM under a single application-wide secret.
  *
- * Custodial key encryption with a relaxed security model.
- *
- * This is intended to imitate envelope encryption, though this leaves a wider attack surgace;
- * in an actual deployment we would realistically replace WALLET_ENC_SECRET with a KMS-held
- * master key (so as to only storing the ciphertext).
+ * Key encryption with a relaxed security model: this is intended to imitate envelope encryption,
+ * though this leaves a wider attack surface; in an actual deployment we would realistically replace
+ * WALLET_ENC_SECRET with a KMS-held master key (such that we're only storing the ciphertext).
  */
 function encKey(): Buffer {
 	const secret = env.WALLET_ENC_SECRET ?? "NNtbgNJgK54cY7jE7ugWfuQY33WTzZuPHT";
