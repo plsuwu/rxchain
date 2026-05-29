@@ -15,8 +15,12 @@ contract PrescriptionDispense is PrescriptionControl {
     error AlreadyLocked();
     error ExpiredOnDispense();
 
+    /// @notice This constructor also handles `PrescriptionMint` construction, passing the
+    ///         Registry contract to it for internal prescriber validation.
     constructor(Registry _registry) ERC721("Prescription", "RX") PrescriptionMint(_registry) {}
 
+    /// @notice performs token verification, running dispense logic (counter decrement, locking,
+    ///         event emission) if token is valid, or reverts with custom error otherwise.
     function dispense(uint256 tokenId) external {
         if (ownerOf(tokenId) != msg.sender) {
             revert NotHolder();

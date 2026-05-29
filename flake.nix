@@ -30,13 +30,16 @@
         };
 
         craneLib = crane.mkLib pkgs;
-
+        
+        # cannot for the life of me figure out why this is broken
+        # but its probably unimportant here...
         client = pkgs.buildNpmPackage {
-          pname = "ifb452-client";
+          pname = "rxchain-client";
           version = "0.0.1";
-          src = "./client";
+          src = ./client;
 
-          npmDepsHash = "sha256-zqBjLXnz4hCZV5elDNBMoi954afDYHXqK+csSds7Y5w=";
+          npmDepsFetcherVersion = 2;
+          npmDepsHash = pkgs.lib.fakeHash;
 
           buildPhase = ''
             npm install 

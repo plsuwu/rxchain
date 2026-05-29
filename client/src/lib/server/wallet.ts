@@ -23,10 +23,8 @@ function client(account: ReturnType<typeof privateKeyToAccount>): WalletClient {
 export const adminWallet = client(adminAccount);
 
 /**
- * Creates a new custodial wallet for a user.
- *
- * Generates a random key, then encrypts it, stores it, and finally seeds it with
- * gas from admin so the account can transact on paths that might check balance.
+ * This doesn't actually create a custodial wallet, that was what I was GOING to do
+ * with this but this is not what we wound up going with.
  * */
 export async function createCustodialWallet(userId: number): Promise<Address> {
 	const privateKey = generatePrivateKey();
@@ -53,7 +51,7 @@ export async function createCustodialWallet(userId: number): Promise<Address> {
 	return account.address;
 }
 
-/** Loads a viem wallet client that signs as the user's custodial key */
+/** Loads a viem wallet client that signs as the user's key */
 export async function walletForUser(userId: number): Promise<WalletClient> {
 	const row = await db.query.wallets.findFirst({
 		where: eq(wallets.userId, userId),
