@@ -2,7 +2,7 @@
 
 > IFB452 (Blockchain Technology) A3
 
-This project was set up to be served at [rx.rat.moe](https://rx.rat.moe) for the presentation - feel free to poke around here, but please note that there is a high possibility of availability issues, so please check the footnote[^1] if you cannot connect.
+This project **was** set up to be served at [rx.rat.moe](https://rx.rat.moe) for the presentation ~~- feel free to poke around here, but please note that there is a high possibility of availability issues, so please check the footnote[^1] if you cannot connect.~~
 
 ## Solidity Contract Setup
 
